@@ -1,3 +1,4 @@
+import 'package:flut/Back-end/connect.dart';
 import 'package:flutter/material.dart';
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -41,7 +42,7 @@ class _LoginPageState extends State<LoginPage> {
                           prefixIcon: Icon(
                             Icons.account_circle,
                             size: 35,
-                            color: Colors.deepPurple,
+                            color: Colors.black87,
                           ),
                           hintText: "Email",
                           labelText: 'Email',
@@ -63,7 +64,7 @@ class _LoginPageState extends State<LoginPage> {
                     prefixIcon: Icon(
                       Icons.account_circle,
                       size: 35,
-                      color: Colors.deepPurple,
+                      color: Colors.black87,
                     ),
                     contentPadding: EdgeInsets.fromLTRB(20, 20, 20, 20),
                     border: OutlineInputBorder(
@@ -96,7 +97,7 @@ class _LoginPageState extends State<LoginPage> {
                   TextButton(
                       style: TextButton.styleFrom(
                         textStyle:
-                        TextStyle(fontSize: 15, color: Colors.deepPurple),
+                        TextStyle(fontSize: 15, color: Color(0xff76ABAE)),
                       ),
                       onPressed: () {
                         final snackBar = SnackBar(
@@ -116,9 +117,12 @@ class _LoginPageState extends State<LoginPage> {
                 height: 30,
               ),
               ElevatedButton(
-                  onPressed: () {
-
-                    if (checkEquality(_username.text, _password.text)) {
+                  onPressed: () async{
+                    Connecting c=Connecting();
+                    print("check");
+                    if (await c.check(_username.text, _password.text).then((value) {
+                        return value;
+                    }).onError((error, stackTrace){ print(error); return false;})) {
                       final snackBar = SnackBar(
                         content: const Text('Login Success'),
                       );
@@ -133,9 +137,9 @@ class _LoginPageState extends State<LoginPage> {
 
                   },
                   style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: Colors.deepPurple.shade900,
-                      textStyle: TextStyle(fontSize: 25),
+                      foregroundColor: Color(0xff222831),
+                      backgroundColor: Color(0xff76ABAE),
+                      textStyle: TextStyle(fontSize: 27 , fontWeight: FontWeight.w600),
                       padding: EdgeInsets.only(
                           left: 130, right: 130, top: 13, bottom: 13)),
                   child: Text("Login")),
@@ -148,11 +152,11 @@ class _LoginPageState extends State<LoginPage> {
                     Navigator.popAndPushNamed(context, '/register').onError((error, stackTrace) => print(error));
                   },
                   style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: Colors.deepPurple.shade900,
-                      textStyle: TextStyle(fontSize: 25),
+                      foregroundColor: Color(0xff222831),
+                      backgroundColor: Color(0xff76ABAE),
+                      textStyle: TextStyle(fontSize: 27 , fontWeight: FontWeight.w600),
                       padding: EdgeInsets.only(
-                          left: 117, right: 117, top: 13, bottom: 13)),
+                          left: 115, right: 115, top: 13, bottom: 13)),
                   child: Text("Register")),
             ],
           ),

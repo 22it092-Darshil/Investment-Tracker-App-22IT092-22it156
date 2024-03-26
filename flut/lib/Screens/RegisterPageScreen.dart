@@ -1,4 +1,7 @@
+import 'package:flut/Back-end/connect.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
 
@@ -12,8 +15,42 @@ class _RegisterPageState extends State<RegisterPage> {
   TextEditingController _number = TextEditingController();
   TextEditingController _password = TextEditingController();
   TextEditingController _finalpassword = TextEditingController();
-
   bool passwordVisible = true;
+  bool finalpasswordVisible = true;
+  bool isEmailValid(String email) {
+    // Email regex pattern
+    final RegExp emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+        caseSensitive: false,
+        multiLine: false); // Check if the email matches the regex pattern
+    return emailRegex.hasMatch(email);
+  }
+
+  bool isPasswordValid(String password) {
+    // Regular expressions to check for the presence of at least 1 alphabet, 1 symbol, and 1 number
+    final RegExp alphabetRegex = RegExp(r'[a-zA-Z]');
+    final RegExp symbolRegex = RegExp(r'[!@#$%^&*(),.?":{}|<>]');
+    final RegExp numberRegex = RegExp(r'[0-9]');
+
+    // Check if the password meets all the criteria
+    return password.length >= 8 &&
+        alphabetRegex.hasMatch(password) &&
+        symbolRegex.hasMatch(password) &&
+        numberRegex.hasMatch(password);
+  }
+
+  bool isValidNumber(String input) {
+    // Check if the input is not empty and contains only digits
+    if (input.isEmpty || !RegExp(r'^[0-9]+$').hasMatch(input)) {
+      return false;
+    }
+
+    // Check if the first digit is greater than 6
+    if (int.parse(input[0]) <= 6) {
+      return false;
+    }
+
+    return true;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +71,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     child: Text(
                       "Welcome",
                       style:
-                      TextStyle(fontSize: 35, fontWeight: FontWeight.w600),
+                          TextStyle(fontSize: 35, fontWeight: FontWeight.w600),
                     ),
                   ),
                   SizedBox(
@@ -51,12 +88,12 @@ class _RegisterPageState extends State<RegisterPage> {
                               prefixIcon: Icon(
                                 Icons.account_circle_outlined,
                                 size: 35,
-                                color: Colors.black54,
+                                color: Colors.black87,
                               ),
                               hintText: "Name",
                               labelText: 'Name',
                               contentPadding:
-                              EdgeInsets.fromLTRB(20, 20, 20, 20),
+                                  EdgeInsets.fromLTRB(20, 20, 20, 20),
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(20),
                                   borderSide: BorderSide(width: 2)),
@@ -72,12 +109,12 @@ class _RegisterPageState extends State<RegisterPage> {
                                 prefixIcon: Icon(
                                   Icons.email_outlined,
                                   size: 35,
-                                  color: Colors.black54,
+                                  color: Colors.black87,
                                 ),
                                 hintText: "Email",
                                 labelText: 'Email',
                                 contentPadding:
-                                EdgeInsets.fromLTRB(20, 20, 20, 20),
+                                    EdgeInsets.fromLTRB(20, 20, 20, 20),
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(20),
                                     borderSide: BorderSide(width: 2))),
@@ -92,12 +129,12 @@ class _RegisterPageState extends State<RegisterPage> {
                                 prefixIcon: Icon(
                                   Icons.phone,
                                   size: 35,
-                                  color: Colors.black54,
+                                  color: Colors.black87,
                                 ),
                                 hintText: "Mobile Number",
                                 labelText: 'Mobile Number',
                                 contentPadding:
-                                EdgeInsets.fromLTRB(20, 20, 20, 20),
+                                    EdgeInsets.fromLTRB(20, 20, 20, 20),
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(20),
                                     borderSide: BorderSide(width: 2))),
@@ -113,7 +150,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             prefixIcon: Icon(
                               Icons.lock_outline,
                               size: 35,
-                              color: Colors.black54,
+                              color: Colors.black87,
                             ),
                             contentPadding: EdgeInsets.fromLTRB(20, 20, 20, 20),
                             border: OutlineInputBorder(
@@ -129,7 +166,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   : Icons.visibility_off),
                               onPressed: () {
                                 setState(
-                                      () {
+                                  () {
                                     passwordVisible = !passwordVisible;
                                   },
                                 );
@@ -143,13 +180,13 @@ class _RegisterPageState extends State<RegisterPage> {
                           height: 15,
                         ),
                         TextField(
-                          obscureText: passwordVisible,
+                          obscureText: finalpasswordVisible,
                           controller: _finalpassword,
                           decoration: InputDecoration(
                             prefixIcon: Icon(
                               Icons.lock_outline,
                               size: 35,
-                              color: Colors.black54,
+                              color: Colors.black87,
                             ),
                             contentPadding: EdgeInsets.fromLTRB(20, 20, 20, 20),
                             border: OutlineInputBorder(
@@ -160,13 +197,13 @@ class _RegisterPageState extends State<RegisterPage> {
                             // helperText:"Password must contain special character",
                             // helperStyle:TextStyle(color:Colors.green),
                             suffixIcon: IconButton(
-                              icon: Icon(passwordVisible
+                              icon: Icon(finalpasswordVisible
                                   ? Icons.visibility
                                   : Icons.visibility_off),
                               onPressed: () {
                                 setState(
-                                      () {
-                                    passwordVisible = !passwordVisible;
+                                  () {
+                                    finalpasswordVisible = !finalpasswordVisible;
                                   },
                                 );
                               },
@@ -180,58 +217,92 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                         ElevatedButton(
                             onPressed: () {
-                              if (_Name.text == "" ||
-                                  _username.text == "" ||
-                                  _password.text == "" ||
-                                  _finalpassword.text == "") {
-                                final snackBar = SnackBar(
-                                  content: const Text('Enter all detail !'),
-                                );
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(snackBar);
-                              } else if (_finalpassword.text !=
-                                  _password.text) {
-                                final snackBar = SnackBar(
-                                  content:
-                                  const Text('Correct Confirm Password'),
-                                );
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(snackBar);
+                              if (!isEmailValid(_username.text)) {
+                                Fluttertoast.showToast(
+                                    msg: "Invalid Email",
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity.BOTTOM,
+                                    timeInSecForIosWeb: 1,
+                                    backgroundColor: Colors.black54,
+                                    textColor: Colors.white,
+                                    fontSize: 16.0);
+                              } else if (!isValidNumber(_number.text)) {
+                                Fluttertoast.showToast(
+                                    msg: "Invalid Number",
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity.BOTTOM,
+                                    timeInSecForIosWeb: 1,
+                                    backgroundColor: Colors.black54,
+                                    textColor: Colors.white,
+                                    fontSize: 16.0);
+                              } else if (!isPasswordValid(_password.text)) {
+                                Fluttertoast.showToast(
+                                    msg: "Invalid Password",
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity.BOTTOM,
+                                    timeInSecForIosWeb: 1,
+                                    backgroundColor: Colors.black54,
+                                    textColor: Colors.white,
+                                    fontSize: 16.0);
+                              } else if (_password.text != _finalpassword.text) {
+                                Fluttertoast.showToast(
+                                    msg: "Incorrect confirm password",
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity.BOTTOM,
+                                    timeInSecForIosWeb: 1,
+                                    backgroundColor: Colors.black54,
+                                    textColor: Colors.white,
+                                    fontSize: 16.0);
                               } else {
+                                Connecting c = Connecting();
+                                c.add(_Name.text, _username.text,
+                                    _password.text, _number.text);
                                 final snackBar = SnackBar(
-                                  content:
-                                  const Text('Account created successfully'),
+                                  content: const Text(
+                                      'Account created successfully'),
                                 );
                                 ScaffoldMessenger.of(context)
                                     .showSnackBar(snackBar);
+                                Navigator.popAndPushNamed(context, '/home')
+                                    .onError(
+                                        (error, stackTrace) => print(error));
                               }
-                            }
-                            ,
+                            },
                             style: ElevatedButton.styleFrom(
-                                foregroundColor: Colors.white,
-                                backgroundColor: Colors.deepPurple.shade900,
-                                textStyle: TextStyle(fontSize: 25),
+                                foregroundColor: Color(0xff222831),
+                                backgroundColor: Color(0xff76ABAE),
+                                textStyle: TextStyle(fontSize: 27 , fontWeight: FontWeight.w600),
                                 padding: EdgeInsets.only(
                                     left: 117,
                                     right: 117,
                                     top: 13,
                                     bottom: 13)),
                             child: Text("Register")),
-                        SizedBox(height: 15,),
+                        SizedBox(
+                          height: 15,
+                        ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text("Already have account ?    ",style: TextStyle(fontSize: 17),),
+                            Text(
+                              "Already have account ?    ",
+                              style: TextStyle(fontSize: 17),
+                            ),
                             InkWell(
-                              onTap: (){
-                                Navigator.popAndPushNamed(context, '/login').onError((error, stackTrace) => print(error));
+                              onTap: () {
+                                Navigator.popAndPushNamed(context, '/login')
+                                    .onError(
+                                        (error, stackTrace) => print(error));
                               },
                               child: Row(
                                 children: [
-                                  Text("Login",style: TextStyle(fontSize: 17),),
+                                  Text(
+                                    "Login",
+                                    style: TextStyle(fontSize: 17),
+                                  ),
                                   Icon(Icons.login_outlined)
                                 ],
-                              ) ,
+                              ),
                             )
                           ],
                         )
